@@ -10,15 +10,25 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package de.openknowledge.jsf;
+package de.openknowledge.domain.telephone;
 
-import org.jboss.arquillian.graphene.page.Location;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import static org.apache.commons.lang3.Validate.isTrue;
 
-@Location("test.xhtml")
-public class TestPage {
+import de.openknowledge.domain.AbstractSimpleValueObject;
 
-  @FindBy(id = "title")
-  private WebElement element;
+public class SubscriberNumber extends AbstractSimpleValueObject<String> {
+
+  protected SubscriberNumber() {
+    // for frameworks
+  }
+
+  public SubscriberNumber(String value) {
+    super(value);
+  }
+
+  @Override
+  protected String validate(String value) {
+    isTrue(super.validate(value).charAt(0) != '0', "subscriber number may not start with 0");
+    return value;
+  }
 }
