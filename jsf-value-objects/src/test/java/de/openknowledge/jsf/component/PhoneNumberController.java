@@ -18,7 +18,9 @@ import de.openknowledge.domain.telephone.SubscriberNumber;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
+@Named
 @ApplicationScoped
 public class PhoneNumberController {
 

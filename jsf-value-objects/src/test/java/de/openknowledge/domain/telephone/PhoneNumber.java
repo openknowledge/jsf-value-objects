@@ -33,6 +33,14 @@ public class PhoneNumber extends AbstractValueObject {
     this.areaCode = areaCode;
     this.subscriberNumber = subscriberNumber;
   }
+  
+  public AreaCode getAreaCode() {
+    return areaCode;
+  }
+  
+  public SubscriberNumber getSubscriberNumber() {
+    return subscriberNumber;
+  }
 
   @Override
   protected Object[] values() {

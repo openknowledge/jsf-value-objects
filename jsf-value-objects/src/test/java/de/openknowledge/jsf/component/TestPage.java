@@ -20,5 +20,30 @@ import org.openqa.selenium.support.FindBy;
 public class TestPage {
 
   @FindBy(id = "title")
-  private WebElement element;
+  private WebElement title;
+  
+  @FindBy(id = "phoneNumber")
+  private PhoneNumberComponentFragment phoneNumber;
+  
+  @FindBy(id = "empty")
+  private PhoneNumberComponentFragment emptyPhoneNumber;
+  
+  @FindBy(id = "submit")
+  private WebElement submit;
+
+  public WebElement getTitle() {
+    return title;
+  }
+  
+  public PhoneNumberComponentFragment getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  public PhoneNumberComponentFragment getEmptyPhoneNumber() {
+    return emptyPhoneNumber;
+  }
+
+  public void submit() {
+    submit.click();
+  }
 }

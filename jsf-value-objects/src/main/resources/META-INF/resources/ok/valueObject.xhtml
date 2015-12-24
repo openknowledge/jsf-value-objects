@@ -12,14 +12,17 @@
   an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
   specific language governing permissions and limitations under the License.
 -->
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:cc="http://xmlns.jcp.org/jsf/composite"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
-  <cc:interface componentType="de.openknowledge.jsf.component.ValueObjectComponent">
-    <cc:attribute name="value" />
-  </cc:interface>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+  xmlns:h="http://xmlns.jcp.org/jsf/html">
+<cc:interface componentType="de.openknowledge.jsf.component.ValueObjectComponent">
+  <cc:attribute name="value" />
+</cc:interface>
 
-  <cc:implementation>
+<cc:implementation>
+  <div id="#{cc.clientId}">
     <cc:insertChildren />
-  </cc:implementation>
+  </div>
+</cc:implementation>
 </html>

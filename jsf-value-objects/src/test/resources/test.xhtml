@@ -19,10 +19,10 @@
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
   xmlns:ok="http://xmlns.jcp.org/jsf/composite/ok">
 <h:head>
-  <title>JSF Value Object Sample</title>
+  <title id="title">JSF Value Object Sample</title>
 </h:head>
 <h:body>
-  <h:form>
+  <h:form prependId="false">
     <ok:valueObject
       id="phoneNumber"
       value="#{phoneNumberController.phoneNumber}">
@@ -54,33 +54,8 @@
         <f:validator validatorId="de.openknowledge.SubscriberNumberValidator" />
       </h:inputText>
     </ok:valueObject>
-    <h:commandButton id="valid" />
-    <h:commandButton id="phoneNumberInvalid">
-      <f:param name="phoneNumberInvalid" />
-    </h:commandButton>
-    <h:commandButton id="areaCodeInvalid">
-      <f:param name="areaCodeInvalid" />
-    </h:commandButton>
-    <h:commandButton id="subscriberNumberInvalid">
-      <f:param name="subscriberNumberInvalid" />
-    </h:commandButton>
-    <h:commandButton id="phoneNumberAndAreaCodeInvalid">
-      <f:param name="phoneNumberInvalid" />
-      <f:param name="areaCodeInvalid" />
-    </h:commandButton>
-    <h:commandButton id="phoneNumberAndSubscriberNumberInvalid">
-      <f:param name="phoneNumberInvalid" />
-      <f:param name="subscriberNumberInvalid" />
-    </h:commandButton>
-    <h:commandButton id="areaCodeAndSubscriberNumberInvalid">
-      <f:param name="areaCodeInvalid" />
-      <f:param name="subscriberNumberInvalid" />
-    </h:commandButton>
-    <h:commandButton id="allInvalid">
-      <f:param name="phoneNumberInvalid" />
-      <f:param name="areaCodeInvalid" />
-      <f:param name="subscriberNumberInvalid" />
-    </h:commandButton>
+    <h:messages id="messages" />
+    <h:commandButton id="submit" />
   </h:form>
 </h:body>
 </html>

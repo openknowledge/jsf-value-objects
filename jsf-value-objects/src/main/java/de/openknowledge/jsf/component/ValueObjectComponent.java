@@ -1,11 +1,11 @@
 /*
  * Copyright (C) Arne Limburg
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -16,9 +16,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +38,8 @@ import javax.faces.convert.ConverterException;
 @FacesComponent("de.openknowledge.jsf.component.ValueObjectComponent")
 public class ValueObjectComponent extends UIInput implements NamingContainer {
 
+  private static final String SUBMITTED_VALUE_DELIMITER = "submittedValueDelimiter";
+
   private static final String CC_ATTRS_VALUE = "#{cc.attrs.value.";
 
   @Override
@@ -55,6 +56,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     Object value = getValue();
     if (value == null) {
       forEachChild(new ChildProcessor() {
+
         public void process(UIInput child) {
           child.setValue(null);
           child.setLocalValueSet(false);
@@ -68,19 +70,19 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     super.setValue(value);
     if (value == null) {
       forEachChild(new ChildProcessor() {
+
         public void process(UIInput child) {
           child.setValue(null);
         }
       });
     } else {
       forEachChild(new ChildProcessor() {
+
         public void process(UIInput child) {
-          ValueExpression original = child.getValueExpression("value");
-          ExpressionFactory expressionFactory = getFacesContext().getApplication().getExpressionFactory();
-          ELContext elContext = getFacesContext().getELContext();
-          ValueExpression valueExpression = expressionFactory.createValueExpression(
-              elContext, original.getExpressionString().replace("cc.attrs.", "cc."), original.getExpectedType());
-          child.setValue(valueExpression.getValue(elContext));
+          if (child.isLocalValueSet()) {
+            child.setValue(null);
+            child.setLocalValueSet(false);
+          }
         }
       });
     }
@@ -90,10 +92,13 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   public void processDecodes(FacesContext context) {
     super.processDecodes(context);
     final StringBuilder submittedValue = new StringBuilder();
+    final Object submittedValueDelimiter
+      = getAttributes().containsKey(SUBMITTED_VALUE_DELIMITER) ? getAttributes().get(SUBMITTED_VALUE_DELIMITER) : ",";
     forEachChild(new ChildProcessor() {
+
       public void process(UIInput child) {
         if (child.getSubmittedValue() != null) {
-          submittedValue.append(child.getSubmittedValue()).append(getAttributes().get("submittedValueDelimiter"));
+          submittedValue.append(child.getSubmittedValue()).append(submittedValueDelimiter);
         }
       }
     });
@@ -105,7 +110,9 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   @Override
   public void processUpdates(FacesContext context) {
     forEachChild(new ChildProcessor() {
+
       public void process(UIInput child) {
+        child.setValue(null);
         child.setLocalValueSet(false);
       }
     });
@@ -116,6 +123,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   public void resetValue() {
     super.resetValue();
     forEachChild(new ChildProcessor() {
+
       public void process(UIInput child) {
         child.resetValue();
       }
@@ -127,6 +135,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     processChildValidators(context);
     final Map<UIInput, Object> oldSubmittedValues = new HashMap<>();
     forEachChild(new ChildProcessor() {
+
       public void process(UIInput child) {
         oldSubmittedValues.put(child, child.getSubmittedValue());
         child.setSubmittedValue(null);
@@ -134,6 +143,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     });
     super.processValidators(context);
     forEachChild(new ChildProcessor() {
+
       public void process(UIInput child) {
         child.setSubmittedValue(oldSubmittedValues.get(child));
       }
@@ -150,6 +160,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
         wasNull = true;
       }
       forEachChild(new ChildProcessor() {
+
         public void process(UIInput child) {
           child.processValidators(context);
         }
@@ -165,38 +176,40 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
 
   @Override
   protected Object getConvertedValue(final FacesContext context, Object submittedValue) throws ConverterException {
-    final Map<String, Object> parameters = new LinkedHashMap<>();
+    final List<UIInput> parameters = new ArrayList<>();
     forEachChild(new ChildProcessor() {
+
       public void process(UIInput child) {
-        String expressionString = child.getValueExpression("value").getExpressionString().replace(CC_ATTRS_VALUE, "");
-        parameters.put(expressionString.substring(0, expressionString.length() - 1), child.getValue());
+        parameters.add(child);
       }
     });
-    return newInstance(context, parameters);
+    return newInstance(context, parameters.toArray(new UIInput[parameters.size()]));
   }
 
-  protected Object newInstance(FacesContext context) {
-    return newInstance(context, Collections.emptyMap());
-  }
-
-  protected Object newInstance(FacesContext context, Map<String, Object> parameters) {
-    return newInstance(context, parameters.values());
-  }
-
-  protected Object newInstance(FacesContext context, Object... parameters) {
+  protected Object newInstance(FacesContext context, UIInput... parameterComponents) {
+    List<Object> parameterValues = new ArrayList<>();
     List<Class<?>> parameterTypes = new ArrayList<>();
-    for (Object parameter : parameters) {
-      parameterTypes.add(parameter.getClass());
+    boolean allParametersNull = true;
+    for (UIInput parameterComponent: parameterComponents) {
+      Object parameterValue = parameterComponent.getValue();
+      parameterValues.add(parameterValue);
+      if (parameterValue != null) {
+        allParametersNull = false;
+        parameterTypes.add(parameterValue.getClass());
+      } else {
+        parameterTypes.add(null);
+      }
+    }
+    if (parameterComponents.length != 0 && allParametersNull && valueIsNullWhenAllParametersAreNull()) {
+      return null;
     }
     Class<?> type = getValueExpression("value").getType(context.getELContext());
     try {
-      Constructor<?> constructor = type.getDeclaredConstructor(parameterTypes.toArray(new Class[parameterTypes.size()]));
+      Constructor<?> constructor = getConstructor(type, parameterTypes.toArray(new Class<?>[parameterTypes.size()]));
       if (!constructor.isAccessible()) {
         constructor.setAccessible(true);
       }
-      return constructor.newInstance(parameters);
-    } catch (NoSuchMethodException e) {
-      throw newConstructorNotFoundException(type, parameterTypes);
+      return constructor.newInstance(parameterValues.toArray());
     } catch (InvocationTargetException e) {
       throw new ConverterException(e.getTargetException());
     } catch (ReflectiveOperationException e) {
@@ -205,18 +218,78 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   protected void forEachChild(ChildProcessor processor) {
+    String parentValueExpression = getValueExpression("value").getExpressionString();
+    String prefix = parentValueExpression.substring(0, parentValueExpression.lastIndexOf('}')) + '.';
     for (UIComponent component : getFacet(COMPOSITE_FACET_NAME).getChildren()) {
-      if (component instanceof UIInput) {
-        UIInput input = (UIInput)component;
-        if (input.getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)) {
+      forEachChild(component, processor, prefix);
+    }
+  }
+
+  private void forEachChild(UIComponent parent, ChildProcessor processor, String prefix) {
+    if (parent instanceof UIInput) {
+      UIInput input = (UIInput)parent;
+      ValueExpression childValueExpression = input.getValueExpression("value");
+      String childValueExpressionString = input.getValueExpression("value").getExpressionString();
+      if (childValueExpressionString.startsWith(prefix)) {
+        ExpressionFactory expressionFactory = getFacesContext().getApplication().getExpressionFactory();
+        ELContext elContext = getFacesContext().getELContext();
+        // lookup has to be directed to local value, so replace value expression with #{cc.attrs.value...}
+        // TODO maybe cache new value expression?
+        ValueExpression valueExpression = expressionFactory.createValueExpression(
+            elContext, childValueExpressionString.replace(prefix, CC_ATTRS_VALUE), childValueExpression.getExpectedType());
+        input.setValueExpression("value", valueExpression);
+        try {
           processor.process(input);
+        } finally {
+          // finally reset original value expression
+          input.setValueExpression("value", childValueExpression);
         }
+      } else if (childValueExpressionString.startsWith(CC_ATTRS_VALUE)) {
+        processor.process(input);
+      }
+    }
+    if (!(parent instanceof ValueObjectComponent)) {
+      for (Iterator<UIComponent> i = parent.getFacetsAndChildren(); i.hasNext();) {
+        forEachChild(i.next(), processor, prefix); 
       }
     }
   }
 
-  private IllegalStateException newConstructorNotFoundException(Class<?> type, List<Class<?>> parameterTypes) {
-    if (parameterTypes.isEmpty()) {
+  protected boolean valueIsNullWhenAllParametersAreNull() {
+    return true;
+  }
+
+  protected Constructor<?> getConstructor(Class<?> type, Class<?>... parameterTypes) {
+    Constructor<?> constructor = null;
+    for (Constructor<?> declaredConstructor: type.getDeclaredConstructors()) {
+      Class<?>[] declaredParameterTypes = declaredConstructor.getParameterTypes();
+      if (matchParameters(declaredParameterTypes, parameterTypes)) {
+        if (constructor != null) {
+          throw new IllegalStateException("More that one valid constructor found: " + constructor + " and " + declaredConstructor);
+        }
+        constructor = declaredConstructor;
+      }
+    } 
+    if (constructor == null) {
+      throw newConstructorNotFoundException(type, parameterTypes);
+    }
+    return constructor;
+  }
+
+  private boolean matchParameters(Class<?>[] declaredParameterTypes, Class<?>[] parameterTypes) {
+    if (declaredParameterTypes.length != parameterTypes.length) {
+      return false;
+    }
+    for (int i = 0; i < declaredParameterTypes.length; i++) {
+      if (parameterTypes[i] != null && !declaredParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private IllegalStateException newConstructorNotFoundException(Class<?> type, Class<?>... parameterTypes) {
+    if (parameterTypes.length == 0) {
       return new IllegalStateException("No-arg constructor not found for " + type.getName());
     } else {
       StringBuilder messageBuilder = new StringBuilder()
@@ -224,7 +297,11 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
           .append(type.getName())
           .append('(');
       for (Class<?> parameterType : parameterTypes) {
-        messageBuilder.append(parameterType.getName()).append(',');
+        if (parameterType == null) {
+          messageBuilder.append("null,");
+        } else {
+          messageBuilder.append(parameterType.getName()).append(',');
+        }
       }
       messageBuilder.setCharAt(messageBuilder.length() - 1, ')');
       messageBuilder.append(" not found.");
