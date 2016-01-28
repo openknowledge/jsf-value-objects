@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 
 import de.openknowledge.domain.AbstractValueObject;
 import de.openknowledge.domain.telephone.PhoneNumber;
+import de.openknowledge.jsf.converter.AreaCodeConverter;
 import de.openknowledge.jsf.validator.PhoneNumberValidator;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -57,6 +58,7 @@ public class ValueObjectComponentTest {
         .addClass(PhoneNumberController.class)
         .addPackage(PhoneNumber.class.getPackage())
         .addPackage(PhoneNumberValidator.class.getPackage())
+        .addPackage(AreaCodeConverter.class.getPackage())
         .addAsWebResource("test.xhtml")
         .addAsWebResource("META-INF/resources/ok/valueObject.xhtml", "resources/ok/valueObject.xhtml")
         .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")

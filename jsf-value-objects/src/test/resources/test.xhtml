@@ -32,12 +32,15 @@
         value="#{phoneNumberController.phoneNumber.areaCode}">
         <f:validator validatorId="de.openknowledge.AreaCodeValidator" />
       </h:inputText>
+      <h:message id="areaCodeMessage" for="areaCode"/>
       <h:inputText
         id="subscriberNumber"
         value="#{phoneNumberController.phoneNumber.subscriberNumber}">
         <f:validator validatorId="de.openknowledge.SubscriberNumberValidator" />
       </h:inputText>
+      <h:message id="subscriberNumberMessage" for="subscriberNumber"/>
     </ok:valueObject>
+    <h:message id="phoneNumberMessage" for="phoneNumber"/>
 
     <ok:valueObject
       id="emptyPhoneNumber"
@@ -48,13 +51,15 @@
         value="#{phoneNumberController.emptyPhoneNumber.areaCode}">
         <f:validator validatorId="de.openknowledge.AreaCodeValidator" />
       </h:inputText>
+      <h:message id="areaCodeMessage" for="areaCode"/>
       <h:inputText
         id="subscriberNumber"
         value="#{phoneNumberController.emptyPhoneNumber.subscriberNumber}">
         <f:validator validatorId="de.openknowledge.SubscriberNumberValidator" />
       </h:inputText>
+      <h:message id="subscriberNumberMessage" for="subscriberNumber"/>
     </ok:valueObject>
-    <h:messages id="messages" />
+    <h:message id="emptyPhoneNumberMessage" for="emptyPhoneNumber"/>
     <h:commandButton id="submit" />
   </h:form>
 </h:body>
