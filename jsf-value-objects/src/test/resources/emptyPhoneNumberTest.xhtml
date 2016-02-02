@@ -25,18 +25,18 @@
   <h:form prependId="false">
     <ok:valueObject
       id="phoneNumber"
-      value="#{phoneNumberController.emptyPhoneNumber}"
+      value="#{phoneNumberController.phoneNumber}"
       converterMessage="could not create phone number">
       <f:validator validatorId="de.openknowledge.PhoneNumberValidator" />
       <h:inputText
         id="areaCode"
-        value="#{phoneNumberController.emptyPhoneNumber.areaCode}">
+        value="#{phoneNumberController.phoneNumber.areaCode}">
         <f:validator validatorId="de.openknowledge.AreaCodeValidator" />
       </h:inputText>
       <h:message id="areaCodeMessage" for="areaCode"/>
       <h:inputText
         id="subscriberNumber"
-        value="#{phoneNumberController.emptyPhoneNumber.subscriberNumber}">
+        value="#{phoneNumberController.phoneNumber.subscriberNumber}">
         <f:validator validatorId="de.openknowledge.SubscriberNumberValidator" />
       </h:inputText>
       <h:message id="subscriberNumberMessage" for="subscriberNumber"/>

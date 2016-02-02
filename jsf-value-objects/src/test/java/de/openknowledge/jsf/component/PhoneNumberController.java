@@ -27,11 +27,12 @@ import javax.inject.Named;
 public class PhoneNumberController {
 
   private PhoneNumber phoneNumber;
-  private PhoneNumber emptyPhoneNumber;
   
   @PostConstruct
   private void initializePhoneNumber() {
-    phoneNumber = new PhoneNumber(new AreaCode("0441"), new SubscriberNumber("4082100"));
+    if (FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().endsWith("/phoneNumberTest.xhtml")) {
+      phoneNumber = new PhoneNumber(new AreaCode("0441"), new SubscriberNumber("4082100"));
+    }
   }
   
   public PhoneNumber getPhoneNumber() {
@@ -40,14 +41,6 @@ public class PhoneNumberController {
   
   public void setPhoneNumber(PhoneNumber phoneNumber) {
     this.phoneNumber = phoneNumber;
-  }
-  
-  public PhoneNumber getEmptyPhoneNumber() {
-    return emptyPhoneNumber;
-  }
-  
-  public void setEmptyPhoneNumber(PhoneNumber emptyPhoneNumber) {
-    this.emptyPhoneNumber = emptyPhoneNumber;
   }
 
   public void save() {
