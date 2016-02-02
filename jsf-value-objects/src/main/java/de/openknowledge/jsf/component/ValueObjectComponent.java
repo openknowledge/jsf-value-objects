@@ -180,6 +180,9 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     forEachChild(new ChildProcessor() {
 
       public void process(UIInput child) {
+        if (!child.isValid()) {
+          throw new ConverterException(child.getClientId() + " is invalid");
+        }
         parameters.add(child);
       }
     });

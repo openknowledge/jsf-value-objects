@@ -26,7 +26,7 @@ public class PhoneNumber extends AbstractValueObject {
 
   public PhoneNumber(AreaCode areaCode, SubscriberNumber subscriberNumber) {
     if (areaCode != null && subscriberNumber != null && areaCode.toString().length() > subscriberNumber.toString().length()) {
-      throw new IllegalArgumentException("subsriber number length must be greater than area code length");
+      throw new IllegalArgumentException("area code must have lesser digits than subscriber number");
     }
     // note: area code and phone number may be null for testing purpose
     // in real world projects, a notNull-check should be placed here

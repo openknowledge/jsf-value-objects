@@ -12,6 +12,8 @@
  */
 package de.openknowledge.jsf.validator;
 
+import de.openknowledge.domain.telephone.SubscriberNumber;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -24,8 +26,9 @@ public class SubscriberNumberValidator implements Validator {
 
   @Override
   public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-    if (context.getExternalContext().getRequestParameterMap().containsKey("subscriberNumberInvalid")) {
-      throw new ValidatorException(new FacesMessage("subscriber number invalid"));
+    SubscriberNumber subscriberNumber = (SubscriberNumber)value;
+    if (subscriberNumber != null && subscriberNumber.toString().equals("12345")) {
+      throw new ValidatorException(new FacesMessage("subscriber number may not be '12345'"));
     }
   }
 }

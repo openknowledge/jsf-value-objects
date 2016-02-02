@@ -12,6 +12,8 @@
  */
 package de.openknowledge.jsf.validator;
 
+import de.openknowledge.domain.telephone.AreaCode;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -24,8 +26,9 @@ public class AreaCodeValidator implements Validator {
 
   @Override
   public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-    if (context.getExternalContext().getRequestParameterMap().containsKey("areaCodeInvalid")) {
-      throw new ValidatorException(new FacesMessage("area code invalid"));
+    AreaCode areaCode = (AreaCode)value;
+    if (areaCode != null && areaCode.toString().equals("01234")) {
+      throw new ValidatorException(new FacesMessage("area code may not be '01234'"));
     }
   }
 }

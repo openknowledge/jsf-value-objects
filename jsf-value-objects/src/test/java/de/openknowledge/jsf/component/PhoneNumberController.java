@@ -18,6 +18,8 @@ import de.openknowledge.domain.telephone.SubscriberNumber;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
 @Named
@@ -46,5 +48,9 @@ public class PhoneNumberController {
   
   public void setEmptyPhoneNumber(PhoneNumber emptyPhoneNumber) {
     this.emptyPhoneNumber = emptyPhoneNumber;
+  }
+
+  public void save() {
+    FacesContext.getCurrentInstance().addMessage("submit", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully saved", "The data was successfully saved"));
   }
 }

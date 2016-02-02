@@ -11,25 +11,35 @@
  * specific language governing permissions and limitations under the License.
  */
 package de.openknowledge.jsf.component;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 
-import org.jboss.arquillian.graphene.page.Location;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@Location("test.xhtml")
-public class TestPage {
+import java.util.concurrent.TimeUnit;
+
+public abstract class AbstractPhoneNumberTestPage {
 
   @FindBy(id = "title")
   private WebElement title;
   
   @FindBy(id = "phoneNumber")
   private PhoneNumberComponentFragment phoneNumber;
-  
-  @FindBy(id = "empty")
-  private PhoneNumberComponentFragment emptyPhoneNumber;
+
+  @FindBy(id = "phoneNumber:areaCodeMessage")
+  private WebElement areaCodeMessage;
+
+  @FindBy(id = "phoneNumber:subscriberNumberMessage")
+  private WebElement subscriberNumberMessage;
+
+  @FindBy(id = "phoneNumberMessage")
+  private WebElement phoneNumberMessage;
   
   @FindBy(id = "submit")
   private WebElement submit;
+
+  @FindBy(id = "submitMessage")
+  private WebElement submitMessage;
 
   public WebElement getTitle() {
     return title;
@@ -39,11 +49,24 @@ public class TestPage {
     return phoneNumber;
   }
 
-  public PhoneNumberComponentFragment getEmptyPhoneNumber() {
-    return emptyPhoneNumber;
+  public WebElement getAreaCodeMessage() {
+    return areaCodeMessage;
+  }
+  
+  public WebElement getSubscriberNumberMessage() {
+    return subscriberNumberMessage;
+  }
+  
+  public WebElement getPhoneNumberMessage() {
+    return phoneNumberMessage;
+  }
+
+  public WebElement getSubmitMessage() {
+    return submitMessage;
   }
 
   public void submit() {
     submit.click();
+    waitGui().withTimeout(10, TimeUnit.SECONDS);
   }
 }

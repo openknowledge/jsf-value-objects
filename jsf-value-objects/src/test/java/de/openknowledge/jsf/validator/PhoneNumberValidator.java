@@ -12,6 +12,8 @@
  */
 package de.openknowledge.jsf.validator;
 
+import de.openknowledge.domain.telephone.PhoneNumber;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -24,8 +26,13 @@ public class PhoneNumberValidator implements Validator {
 
   @Override
   public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-    if (context.getExternalContext().getRequestParameterMap().containsKey("phoneNumberInvalid")) {
-      throw new ValidatorException(new FacesMessage("phone number invalid"));
+    PhoneNumber phoneNumber = (PhoneNumber)value;
+    if (phoneNumber != null
+        && phoneNumber.getAreaCode() != null
+        && phoneNumber.getSubscriberNumber() != null
+        && phoneNumber.getAreaCode().toString().equals("0123")
+        && phoneNumber.getSubscriberNumber().toString().equals("456789")) {
+      throw new ValidatorException(new FacesMessage("phone number may not be '0123 456789'"));
     }
   }
 }
