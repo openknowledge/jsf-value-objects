@@ -19,28 +19,16 @@
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
   xmlns:ok="http://xmlns.jcp.org/jsf/composite/ok">
 <h:head>
-  <title id="title">JSF Value Object Sample</title>
+  <title>JSF Value Object Sample</title>
 </h:head>
 <h:body>
   <h:form prependId="false">
-    <ok:valueObject
+    <ok:phoneNumber
       id="phoneNumber"
       value="#{phoneNumberController.phoneNumber}"
       converterMessage="could not create phone number">
       <f:validator validatorId="de.openknowledge.PhoneNumberValidator" />
-      <h:inputText
-        id="areaCode"
-        value="#{phoneNumberController.phoneNumber.areaCode}">
-        <f:validator validatorId="de.openknowledge.AreaCodeValidator" />
-      </h:inputText>
-      <h:message id="areaCodeMessage" for="areaCode"/>
-      <h:inputText
-        id="subscriberNumber"
-        value="#{phoneNumberController.phoneNumber.subscriberNumber}">
-        <f:validator validatorId="de.openknowledge.SubscriberNumberValidator" />
-      </h:inputText>
-      <h:message id="subscriberNumberMessage" for="subscriberNumber"/>
-    </ok:valueObject>
+    </ok:phoneNumber>
     <h:message id="phoneNumberMessage" for="phoneNumber"/>
     <h:commandButton id="submit" action="#{phoneNumberController.save()}"/>
     <h:message id="submitMessage" for="submit"/>

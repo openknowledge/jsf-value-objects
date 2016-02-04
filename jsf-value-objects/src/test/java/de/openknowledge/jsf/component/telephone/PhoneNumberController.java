@@ -34,7 +34,7 @@ public class PhoneNumberController implements Serializable {
   
   @PostConstruct
   private void initializePhoneNumber() {
-    if (FacesContext.getCurrentInstance().getExternalContext().getRequestServletPath().endsWith("/phoneNumberTest.xhtml")) {
+    if (!FacesContext.getCurrentInstance().getExternalContext().getRequestServletPath().contains("empty")) {
       phoneNumber = INITIAL_VALUE;
     }
   }
