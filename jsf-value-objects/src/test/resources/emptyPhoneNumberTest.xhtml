@@ -44,6 +44,7 @@
     <h:message id="phoneNumberMessage" for="phoneNumber"/>
     <h:commandButton id="submit" action="#{phoneNumberController.save()}"/>
     <h:message id="submitMessage" for="submit"/>
+    <h:outputText id="result" value="#{phoneNumberController.phoneNumberString}"/>
   </h:form>
 </h:body>
 </html>

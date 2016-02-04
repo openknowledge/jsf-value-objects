@@ -16,25 +16,33 @@ import de.openknowledge.domain.telephone.AreaCode;
 import de.openknowledge.domain.telephone.PhoneNumber;
 import de.openknowledge.domain.telephone.SubscriberNumber;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.faces.application.FacesMessage;
+import javax.faces.view.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
 @Named
-@ApplicationScoped
-public class PhoneNumberController {
+@ViewScoped
+public class PhoneNumberController implements Serializable {
 
+  public static final PhoneNumber INITIAL_VALUE = new PhoneNumber(new AreaCode("0441"), new SubscriberNumber("4082100"));
   private PhoneNumber phoneNumber;
   
   @PostConstruct
   private void initializePhoneNumber() {
-    if (FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().endsWith("/phoneNumberTest.xhtml")) {
-      phoneNumber = new PhoneNumber(new AreaCode("0441"), new SubscriberNumber("4082100"));
+    if (FacesContext.getCurrentInstance().getExternalContext().getRequestServletPath().endsWith("/phoneNumberTest.xhtml")) {
+      phoneNumber = INITIAL_VALUE;
     }
   }
-  
+
+  public String getPhoneNumberString() {
+    return Objects.toString(phoneNumber);
+  }
+
   public PhoneNumber getPhoneNumber() {
     return phoneNumber;
   }

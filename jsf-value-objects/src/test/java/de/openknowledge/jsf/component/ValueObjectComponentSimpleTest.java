@@ -17,22 +17,17 @@ import static org.junit.Assert.assertThat;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.page.InitialPage;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.warp.WarpTest;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
 
 @WarpTest
 @RunAsClient
 @RunWith(Arquillian.class)
-public class ValueObjectComponentSimpleTest {
-
-  @Drone
-  private WebDriver browser;
+public class ValueObjectComponentSimpleTest extends AbstractValueObjectComponentTest {
   
   @Deployment
   public static WebArchive deployment() {
@@ -41,9 +36,59 @@ public class ValueObjectComponentSimpleTest {
   }
 
   @Test
-  public void page(@InitialPage PhoneNumberTestPage page) {
-    assertThat(page.getTitle().getText(), is("JSF Value Object Sample"));
-    page.getPhoneNumber().setAreaCode("0441");
-    page.submit();
+  public void validPhoneNumber(@InitialPage PhoneNumberTestPage page) {
+    super.validPhoneNumber(page);
+  }
+
+  @Test
+  public void emptyAreaCode(@InitialPage PhoneNumberTestPage page) {
+    super.emptyAreaCode(page);
+  }
+
+  @Test
+  public void inconvertibleAreaCode(@InitialPage PhoneNumberTestPage page) {
+    super.inconvertibleAreaCode(page);
+  }
+
+  @Test
+  public void invalidAreaCode(final @InitialPage PhoneNumberTestPage page) {
+    super.invalidAreaCode(page);
+  }
+
+  @Test
+  public void emptySubscriberNumber(@InitialPage PhoneNumberTestPage page) {
+    super.emptySubscriberNumber(page);
+  }
+
+  @Test
+  public void inconvertibleSubscriberNumber(@InitialPage PhoneNumberTestPage page) {
+    super.inconvertibleSubscriberNumber(page);
+  }
+
+  @Test
+  public void invalidSubscriberNumber(@InitialPage PhoneNumberTestPage page) {
+    super.invalidSubscriberNumber(page);
+  }
+
+  @Test
+  public void emptyPhoneNumber(@InitialPage PhoneNumberTestPage page) {
+    assertThat(page.getPhoneNumber().getAreaCode(), is("0441"));
+    assertThat(page.getPhoneNumber().getSubscriberNumber(), is("4082100"));
+    super.emptyPhoneNumber(page);
+  }
+
+  @Test
+  public void inconvertiblePhoneNumber(@InitialPage PhoneNumberTestPage page) {
+    super.inconvertiblePhoneNumber(page);
+  }
+
+  @Test
+  public void invalidPhoneNumber(@InitialPage PhoneNumberTestPage page) {
+    super.invalidPhoneNumber(page);
+  }
+
+  @Override
+  protected String initialValue() {
+    return PhoneNumberController.INITIAL_VALUE.toString();
   }
 }

@@ -16,6 +16,7 @@ public class PhoneNumberComponentFragment {
   }
 
   public void setAreaCode(String code) {
+    areaCode.clear();
     areaCode.sendKeys(code);
   }
 
@@ -24,6 +25,7 @@ public class PhoneNumberComponentFragment {
   }
 
   public void setSubscriberNumber(String number) {
+    subscriberNumber.clear();
     subscriberNumber.sendKeys(number);
   }
 }

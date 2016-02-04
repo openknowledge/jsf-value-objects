@@ -73,5 +73,10 @@ public class ValueObjectComponentEmptyValueTest extends AbstractValueObjectCompo
   @Test
   public void invalidPhoneNumber(@InitialPage EmptyPhoneNumberTestPage page) {
     super.invalidPhoneNumber(page);
+  } 
+
+  @Override
+  protected String initialValue() {
+    return "null";
   }
 }

@@ -43,6 +43,11 @@ public class PhoneNumber extends AbstractValueObject {
   }
 
   @Override
+  public String toString() {
+    return areaCode + " " + subscriberNumber;
+  }
+
+  @Override
   protected Object[] values() {
     return new Object[] {areaCode, subscriberNumber};
   }

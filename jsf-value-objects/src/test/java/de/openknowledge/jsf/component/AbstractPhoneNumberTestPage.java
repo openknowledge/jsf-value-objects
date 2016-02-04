@@ -11,16 +11,14 @@
  * specific language governing permissions and limitations under the License.
  */
 package de.openknowledge.jsf.component;
-import static org.jboss.arquillian.graphene.Graphene.waitGui;
+import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.concurrent.TimeUnit;
-
 public abstract class AbstractPhoneNumberTestPage {
 
-  @FindBy(id = "title")
+  @FindBy(tagName = "title")
   private WebElement title;
   
   @FindBy(id = "phoneNumber")
@@ -40,6 +38,9 @@ public abstract class AbstractPhoneNumberTestPage {
 
   @FindBy(id = "submitMessage")
   private WebElement submitMessage;
+  
+  @FindBy(id = "result")
+  private WebElement result;
 
   public WebElement getTitle() {
     return title;
@@ -65,8 +66,11 @@ public abstract class AbstractPhoneNumberTestPage {
     return submitMessage;
   }
 
+  public String getResult() {
+    return result.getText();
+  }
+
   public void submit() {
-    submit.click();
-    waitGui().withTimeout(10, TimeUnit.SECONDS);
+    guardHttp(submit).click();
   }
 }

@@ -25,7 +25,8 @@
   <h:form prependId="false">
     <ok:valueObject
       id="phoneNumber"
-      value="#{phoneNumberController.phoneNumber}">
+      value="#{phoneNumberController.phoneNumber}"
+      converterMessage="could not create phone number">
       <f:validator validatorId="de.openknowledge.PhoneNumberValidator" />
       <h:inputText
         id="areaCode"
@@ -41,7 +42,9 @@
       <h:message id="subscriberNumberMessage" for="subscriberNumber"/>
     </ok:valueObject>
     <h:message id="phoneNumberMessage" for="phoneNumber"/>
-    <h:commandButton id="submit" />
+    <h:commandButton id="submit" action="#{phoneNumberController.save()}"/>
+    <h:message id="submitMessage" for="submit"/>
+    <h:outputText id="result" value="#{phoneNumberController.phoneNumberString}"/>
   </h:form>
 </h:body>
 </html>
