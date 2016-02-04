@@ -1,7 +1,9 @@
-package de.openknowledge.jsf.component;
+package de.openknowledge.jsf.component.telephone;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import de.openknowledge.jsf.component.Deployments;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;

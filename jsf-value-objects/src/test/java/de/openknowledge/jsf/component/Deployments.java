@@ -2,6 +2,7 @@ package de.openknowledge.jsf.component;
 
 import de.openknowledge.domain.AbstractValueObject;
 import de.openknowledge.domain.telephone.PhoneNumber;
+import de.openknowledge.jsf.component.telephone.PhoneNumberController;
 import de.openknowledge.jsf.converter.AreaCodeConverter;
 import de.openknowledge.jsf.validator.PhoneNumberValidator;
 
@@ -13,6 +14,7 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.webapp30.WebAppDescriptor;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
+
 
 /*
  * Copyright (C) Arne Limburg

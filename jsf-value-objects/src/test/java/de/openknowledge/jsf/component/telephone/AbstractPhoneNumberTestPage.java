@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package de.openknowledge.jsf.component;
+package de.openknowledge.jsf.component.telephone;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 
 import org.openqa.selenium.WebElement;
@@ -18,17 +18,8 @@ import org.openqa.selenium.support.FindBy;
 
 public abstract class AbstractPhoneNumberTestPage {
 
-  @FindBy(tagName = "title")
-  private WebElement title;
-  
   @FindBy(id = "phoneNumber")
   private PhoneNumberComponentFragment phoneNumber;
-
-  @FindBy(id = "phoneNumber:areaCodeMessage")
-  private WebElement areaCodeMessage;
-
-  @FindBy(id = "phoneNumber:subscriberNumberMessage")
-  private WebElement subscriberNumberMessage;
 
   @FindBy(id = "phoneNumberMessage")
   private WebElement phoneNumberMessage;
@@ -42,28 +33,16 @@ public abstract class AbstractPhoneNumberTestPage {
   @FindBy(id = "result")
   private WebElement result;
 
-  public WebElement getTitle() {
-    return title;
-  }
-  
   public PhoneNumberComponentFragment getPhoneNumber() {
     return phoneNumber;
   }
 
-  public WebElement getAreaCodeMessage() {
-    return areaCodeMessage;
-  }
-  
-  public WebElement getSubscriberNumberMessage() {
-    return subscriberNumberMessage;
-  }
-  
-  public WebElement getPhoneNumberMessage() {
-    return phoneNumberMessage;
+  public String getPhoneNumberMessage() {
+    return phoneNumberMessage.getText();
   }
 
-  public WebElement getSubmitMessage() {
-    return submitMessage;
+  public String getSubmitMessage() {
+    return submitMessage.getText();
   }
 
   public String getResult() {
