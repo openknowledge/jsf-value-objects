@@ -10,13 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package de.openknowledge.jsf.converter;
+package de.openknowledge.jsf.converter.telephone;
 
-import de.openknowledge.domain.telephone.AreaCode;
+import de.openknowledge.domain.telephone.SubscriberNumber;
+import de.openknowledge.jsf.converter.AbstractSimpleValueObjectConverter;
 
 import javax.faces.convert.FacesConverter;
 
-@FacesConverter(forClass = AreaCode.class)
-public class AreaCodeConverter extends AbstractSimpleValueObjectConverter<AreaCode> {
+@FacesConverter(forClass = SubscriberNumber.class)
+public class SubscriberNumberConverter extends AbstractSimpleValueObjectConverter<SubscriberNumber> {
 
 }

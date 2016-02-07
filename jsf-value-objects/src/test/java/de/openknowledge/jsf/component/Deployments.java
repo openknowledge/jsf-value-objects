@@ -1,9 +1,13 @@
 package de.openknowledge.jsf.component;
 
 import de.openknowledge.domain.AbstractValueObject;
+import de.openknowledge.domain.address.Address;
 import de.openknowledge.domain.telephone.PhoneNumber;
+import de.openknowledge.jsf.component.address.AddressController;
 import de.openknowledge.jsf.component.telephone.PhoneNumberController;
-import de.openknowledge.jsf.converter.AreaCodeConverter;
+import de.openknowledge.jsf.converter.AbstractSimpleValueObjectConverter;
+import de.openknowledge.jsf.converter.address.CityNameConverter;
+import de.openknowledge.jsf.converter.telephone.AreaCodeConverter;
 import de.openknowledge.jsf.validator.PhoneNumberValidator;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -14,7 +18,6 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.webapp30.WebAppDescriptor;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
-
 
 /*
  * Copyright (C) Arne Limburg
@@ -62,6 +65,16 @@ public class Deployments {
         .addClass(PhoneNumberController.class)
         .addPackage(PhoneNumber.class.getPackage())
         .addPackage(PhoneNumberValidator.class.getPackage())
+        .addClass(AbstractSimpleValueObjectConverter.class)
         .addPackage(AreaCodeConverter.class.getPackage());
+  }
+
+  public static WebArchive addressDeployment() {
+    return jsfDeployment()        
+        .addPackage(AbstractValueObject.class.getPackage())
+        .addClass(AddressController.class)
+        .addPackage(Address.class.getPackage())
+        .addClass(AbstractSimpleValueObjectConverter.class)
+        .addPackage(CityNameConverter.class.getPackage());
   }
 }

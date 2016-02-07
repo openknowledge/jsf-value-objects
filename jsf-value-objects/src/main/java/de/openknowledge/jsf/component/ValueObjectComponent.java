@@ -66,6 +66,23 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   @Override
+  public Object getValue() {
+    boolean componentPopped = false;
+    if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
+        && getCurrentCompositeComponent(getFacesContext()) == this) {
+      popComponentFromEL(getFacesContext());
+      componentPopped = true;
+    }
+    try {
+      return super.getValue();
+    } finally {
+      if (componentPopped) {
+        pushComponentToEL(getFacesContext(), this);
+      }
+    }
+  }
+
+  @Override
   public void setValue(Object value) {
     super.setValue(value);
     if (value == null) {
@@ -132,6 +149,9 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
 
   @Override
   public void processValidators(FacesContext context) {
+    if (getSubmittedValue() == null) {
+      return;
+    }
     processChildValidators(context);
     final Map<UIInput, Object> oldSubmittedValues = new HashMap<>();
     forEachChild(new ChildProcessor() {
@@ -153,12 +173,13 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   protected void processChildValidators(final FacesContext context) {
     boolean wasNull = false;
     boolean wasLocalValueSet = isLocalValueSet();
+    Object value = getValue();
+    if (value == null) {
+      super.setValue(newInstance(context));
+      wasNull = true;
+    }
     try {
       pushComponentToEL(context, this);
-      if (getValue() == null) {
-        super.setValue(newInstance(context));
-        wasNull = true;
-      }
       forEachChild(new ChildProcessor() {
 
         public void process(UIInput child) {
@@ -166,11 +187,28 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
         }
       });
     } finally {
+      popComponentFromEL(context);
       if (wasNull) {
         super.setValue(null);
         setLocalValueSet(wasLocalValueSet);
       }
-      popComponentFromEL(context);
+    }
+  }
+  
+  @Override
+  protected void validateValue(FacesContext context, Object newValue) {
+    boolean componentPopped = false;
+    if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
+        && getCurrentCompositeComponent(getFacesContext()) == this) {
+      popComponentFromEL(getFacesContext());
+      componentPopped = true;
+    }
+    try {
+      super.validateValue(context, newValue);
+    } finally {
+      if (componentPopped) {
+        pushComponentToEL(getFacesContext(), this);
+      }
     }
   }
 
@@ -186,6 +224,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
         parameters.add(child);
       }
     });
+    //#{cc.attrs.value
     return newInstance(context, parameters.toArray(new UIInput[parameters.size()]));
   }
 
@@ -206,7 +245,20 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     if (parameterComponents.length != 0 && allParametersNull && valueIsNullWhenAllParametersAreNull()) {
       return null;
     }
-    Class<?> type = getValueExpression("value").getType(context.getELContext());
+    boolean componentPopped = false;
+    Class<?> type;
+    try {
+      if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
+          && getCurrentCompositeComponent(getFacesContext()) == this) {
+        popComponentFromEL(getFacesContext());
+        componentPopped = true;
+      }
+      type = getValueExpression("value").getType(context.getELContext());
+    } finally {
+      if (componentPopped) {
+        pushComponentToEL(getFacesContext(), this);
+      }
+    }
     try {
       Constructor<?> constructor = getConstructor(type, parameterTypes.toArray(new Class<?>[parameterTypes.size()]));
       if (!constructor.isAccessible()) {
@@ -221,10 +273,25 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   protected void forEachChild(ChildProcessor processor) {
-    String parentValueExpression = getValueExpression("value").getExpressionString();
-    String prefix = parentValueExpression.substring(0, parentValueExpression.lastIndexOf('}')) + '.';
+    ValueExpression oldValueExpression = getValueExpression("value");
+    String parentValueExpression = oldValueExpression.getExpressionString();
+    String resolvedParentValueExpression = getResolvedExpressionString();
+    String prefix = resolvedParentValueExpression.substring(0, resolvedParentValueExpression.lastIndexOf('}')) + '.';
+    
+    boolean replaceValueExpression = false;
+    if (parentValueExpression.startsWith(CC_ATTRS_VALUE)) {
+      ExpressionFactory expressionFactory = getFacesContext().getApplication().getExpressionFactory();
+      ELContext elContext = getFacesContext().getELContext();
+      ValueExpression valueExpression = expressionFactory.createValueExpression(
+          elContext, resolvedParentValueExpression, oldValueExpression.getExpectedType());
+      setValueExpression("value", valueExpression);
+      replaceValueExpression = true;
+    }
     for (UIComponent component : getFacet(COMPOSITE_FACET_NAME).getChildren()) {
       forEachChild(component, processor, prefix);
+    }
+    if (replaceValueExpression) {
+      setValueExpression("value", oldValueExpression);
     }
   }
 
@@ -256,6 +323,22 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
         forEachChild(i.next(), processor, prefix); 
       }
     }
+  }
+
+  private String getResolvedExpressionString() {
+    ValueExpression valueExpression = getValueExpression("value");
+    String expressionString = valueExpression.getExpressionString();
+    
+    if (!expressionString.startsWith(CC_ATTRS_VALUE)) {
+      return expressionString;
+    }
+    UIComponent parent = getParent();
+    while (!(parent instanceof ValueObjectComponent) && parent != null) {
+      parent = parent.getParent();
+    }
+    String parentExpressionString = parent.getValueExpression("value").getExpressionString();
+    return parentExpressionString.substring(0, parentExpressionString.lastIndexOf('}'))
+        + expressionString.substring(CC_ATTRS_VALUE.length() - 1);
   }
 
   protected boolean valueIsNullWhenAllParametersAreNull() {
