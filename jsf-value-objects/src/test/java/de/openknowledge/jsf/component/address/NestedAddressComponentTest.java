@@ -26,16 +26,19 @@ import org.junit.runner.RunWith;
 @WarpTest
 @RunAsClient
 @RunWith(Arquillian.class)
-public class AddressEmptyValueTest extends AbstractNestedValueObjectComponentTest {
+public class NestedAddressComponentTest extends AbstractNestedValueObjectComponentTest {
   
   @Deployment
   public static WebArchive deployment() {
     return Deployments.addressDeployment()
-        .addAsWebResource("emptyAddressTest.xhtml");
+        .addAsWebResource("de/openknowledge/jsf/component/address/address.xhtml", "resources/ok/address.xhtml")
+        .addAsWebResource("de/openknowledge/jsf/component/address/street.xhtml", "resources/ok/street.xhtml")
+        .addAsWebResource("de/openknowledge/jsf/component/address/city.xhtml", "resources/ok/city.xhtml")
+        .addAsWebResource("nestedAddressComponentTest.xhtml");
   }
 
   @Test
-  public void validAddress(@InitialPage EmptyAddressTestPage page) {
+  public void validAddress(@InitialPage NestedAddressComponentTestPage page) {
     super.validAddress(page);
   }
 }

@@ -14,7 +14,7 @@ package de.openknowledge.jsf.component.address;
 
 import org.jboss.arquillian.graphene.page.Location;
 
-@Location("emptyAddressTest.xhtml")
-public class EmptyAddressTestPage extends AbstractAddressTestPage {
+@Location("nestedAddressComponentTest.xhtml")
+public class NestedAddressComponentTestPage extends AbstractAddressTestPage {
 
 }

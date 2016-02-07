@@ -24,11 +24,41 @@
 
 <cc:implementation>
   <div id="#{cc.clientId}">
-    <ok:street id="street" value="#{cc.attrs.value.street}" />
+    <ok:valueObject
+      id="street"
+      value="#{addressController.address.street}">
+      <h:inputText
+        id="streetName"
+        value="#{addressController.address.street.name}" />
+      <h:message
+        id="streetNameMessage"
+        for="streetName" />
+      <h:inputText
+        id="streetNumber"
+        value="#{addressController.address.street.number}" />
+      <h:message
+        id="streetNumberMessage"
+        for="streetNumber" />
+    </ok:valueObject>
     <h:message
       id="streetMessage"
       for="street" />
-    <ok:city id="city" value="#{cc.attrs.value.city}" />
+    <ok:valueObject
+      id="city"
+      value="#{addressController.address.city}">
+      <h:inputText
+        id="zipCode"
+        value="#{addressController.address.city.zipCode}" />
+      <h:message
+        id="zipCodeMessage"
+        for="zipCode" />
+      <h:inputText
+        id="cityName"
+        value="#{addressController.address.city.name}" />
+      <h:message
+        id="cityNameMessage"
+        for="cityName" />
+    </ok:valueObject>
     <h:message
       id="cityMessage"
       for="city" />
