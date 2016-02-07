@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
@@ -67,19 +68,11 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
 
   @Override
   public Object getValue() {
-    boolean componentPopped = false;
-    if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
-        && getCurrentCompositeComponent(getFacesContext()) == this) {
-      popComponentFromEL(getFacesContext());
-      componentPopped = true;
-    }
-    try {
-      return super.getValue();
-    } finally {
-      if (componentPopped) {
-        pushComponentToEL(getFacesContext(), this);
+    return inCompositeComponentContext(new Callable<Object>() {
+      public Object call() {
+        return ValueObjectComponent.super.getValue();
       }
-    }
+    });
   }
 
   @Override
@@ -196,20 +189,12 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
   
   @Override
-  protected void validateValue(FacesContext context, Object newValue) {
-    boolean componentPopped = false;
-    if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
-        && getCurrentCompositeComponent(getFacesContext()) == this) {
-      popComponentFromEL(getFacesContext());
-      componentPopped = true;
-    }
-    try {
-      super.validateValue(context, newValue);
-    } finally {
-      if (componentPopped) {
-        pushComponentToEL(getFacesContext(), this);
+  protected void validateValue(final FacesContext context, final Object newValue) {
+    inCompositeComponentContext(new Runnable() {
+      public void run() {
+        ValueObjectComponent.super.validateValue(context, newValue);
       }
-    }
+    });
   }
 
   @Override
@@ -224,11 +209,10 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
         parameters.add(child);
       }
     });
-    //#{cc.attrs.value
     return newInstance(context, parameters.toArray(new UIInput[parameters.size()]));
   }
 
-  protected Object newInstance(FacesContext context, UIInput... parameterComponents) {
+  protected Object newInstance(final FacesContext context, UIInput... parameterComponents) {
     List<Object> parameterValues = new ArrayList<>();
     List<Class<?>> parameterTypes = new ArrayList<>();
     boolean allParametersNull = true;
@@ -245,20 +229,11 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     if (parameterComponents.length != 0 && allParametersNull && valueIsNullWhenAllParametersAreNull()) {
       return null;
     }
-    boolean componentPopped = false;
-    Class<?> type;
-    try {
-      if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
-          && getCurrentCompositeComponent(getFacesContext()) == this) {
-        popComponentFromEL(getFacesContext());
-        componentPopped = true;
+    Class<?> type = inCompositeComponentContext(new Callable<Class<?>>() {
+      public Class<?> call() throws Exception {
+        return getValueExpression("value").getType(context.getELContext());
       }
-      type = getValueExpression("value").getType(context.getELContext());
-    } finally {
-      if (componentPopped) {
-        pushComponentToEL(getFacesContext(), this);
-      }
-    }
+    });
     try {
       Constructor<?> constructor = getConstructor(type, parameterTypes.toArray(new Class<?>[parameterTypes.size()]));
       if (!constructor.isAccessible()) {
@@ -280,10 +255,7 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     
     boolean replaceValueExpression = false;
     if (parentValueExpression.startsWith(CC_ATTRS_VALUE)) {
-      ExpressionFactory expressionFactory = getFacesContext().getApplication().getExpressionFactory();
-      ELContext elContext = getFacesContext().getELContext();
-      ValueExpression valueExpression = expressionFactory.createValueExpression(
-          elContext, resolvedParentValueExpression, oldValueExpression.getExpectedType());
+      ValueExpression valueExpression = createValueExpression(resolvedParentValueExpression, oldValueExpression.getExpectedType());
       setValueExpression("value", valueExpression);
       replaceValueExpression = true;
     }
@@ -301,12 +273,10 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
       ValueExpression childValueExpression = input.getValueExpression("value");
       String childValueExpressionString = input.getValueExpression("value").getExpressionString();
       if (childValueExpressionString.startsWith(prefix)) {
-        ExpressionFactory expressionFactory = getFacesContext().getApplication().getExpressionFactory();
-        ELContext elContext = getFacesContext().getELContext();
         // lookup has to be directed to local value, so replace value expression with #{cc.attrs.value...}
         // TODO maybe cache new value expression?
-        ValueExpression valueExpression = expressionFactory.createValueExpression(
-            elContext, childValueExpressionString.replace(prefix, CC_ATTRS_VALUE), childValueExpression.getExpectedType());
+        ValueExpression valueExpression
+          = createValueExpression(childValueExpressionString.replace(prefix, CC_ATTRS_VALUE), childValueExpression.getExpectedType());
         input.setValueExpression("value", valueExpression);
         try {
           processor.process(input);
@@ -339,6 +309,42 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     String parentExpressionString = parent.getValueExpression("value").getExpressionString();
     return parentExpressionString.substring(0, parentExpressionString.lastIndexOf('}'))
         + expressionString.substring(CC_ATTRS_VALUE.length() - 1);
+  }
+
+  protected ValueExpression createValueExpression(String expressionString, Class<?> expectedType) {
+    ExpressionFactory expressionFactory = getFacesContext().getApplication().getExpressionFactory();
+    ELContext elContext = getFacesContext().getELContext();
+    return expressionFactory.createValueExpression(elContext, expressionString, expectedType);
+  }
+
+  protected void inCompositeComponentContext(final Runnable runnable) {
+    inCompositeComponentContext(new Callable<Void>() {
+      public Void call() {
+        runnable.run();
+        return null;
+      }
+    });
+  }
+
+  protected <R> R inCompositeComponentContext(Callable<R> callable) {
+    boolean componentPopped = false;
+    if (getValueExpression("value").getExpressionString().startsWith(CC_ATTRS_VALUE)
+        && getCurrentCompositeComponent(getFacesContext()) == this) {
+      popComponentFromEL(getFacesContext());
+      componentPopped = true;
+    }
+    try {
+      return callable.call();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    } finally {
+      if (componentPopped) {
+        pushComponentToEL(getFacesContext(), this);
+      }
+    }
+
   }
 
   protected boolean valueIsNullWhenAllParametersAreNull() {
