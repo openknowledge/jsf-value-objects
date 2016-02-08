@@ -14,10 +14,12 @@ package de.openknowledge.jsf.component.address;
 
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 
+import org.jboss.arquillian.graphene.page.Location;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class AbstractAddressTestPage {
+@Location("address.xhtml")
+public class AddressTestPage {
 
   @FindBy(id = "address")
   private AddressComponentFragment address;

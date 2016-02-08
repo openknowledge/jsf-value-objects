@@ -16,14 +16,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.graphene.page.InitialPage;
+import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 
-public class AbstractNestedValueObjectComponentTest {
+public abstract class AbstractNestedValueObjectComponentTest {
 
   @Drone
   private WebDriver browser;
 
-  public void validAddress(AbstractAddressTestPage page) {
+  @Test
+  public void validAddress(@InitialPage AddressTestPage page) {
     assertThat(browser.getTitle(), is("JSF Nested Value Object Sample"));
 
     page.getAddress().getStreet().setName("Poststrasse");

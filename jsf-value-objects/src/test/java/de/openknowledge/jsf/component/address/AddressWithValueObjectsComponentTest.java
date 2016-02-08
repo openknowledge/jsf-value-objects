@@ -16,11 +16,9 @@ import de.openknowledge.jsf.component.Deployments;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.graphene.page.InitialPage;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.warp.WarpTest;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @WarpTest
@@ -30,14 +28,8 @@ public class AddressWithValueObjectsComponentTest extends AbstractNestedValueObj
   
   @Deployment
   public static WebArchive deployment() {
-    // Note: This test uses the same test page like NestedAddressComponentTest, but with a different address.xhtml
     return Deployments.addressDeployment()
         .addAsWebResource("de/openknowledge/jsf/component/address/addressWithValueObjects.xhtml", "resources/ok/address.xhtml")
-        .addAsWebResource("nestedAddressComponentTest.xhtml");
-  }
-
-  @Test
-  public void validAddress(@InitialPage NestedAddressComponentTestPage page) {
-    super.validAddress(page);
+        .addAsWebResource("nestedAddressComponentTest.xhtml", "address.xhtml");
   }
 }
