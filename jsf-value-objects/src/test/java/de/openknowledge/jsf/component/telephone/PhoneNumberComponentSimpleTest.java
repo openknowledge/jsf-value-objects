@@ -12,18 +12,13 @@
  */
 package de.openknowledge.jsf.component.telephone;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import de.openknowledge.jsf.component.Deployments;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.graphene.page.InitialPage;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.warp.WarpTest;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @WarpTest
@@ -35,59 +30,7 @@ public class PhoneNumberComponentSimpleTest extends AbstractValueObjectComponent
   public static WebArchive deployment() {
     return Deployments.phoneNumberDeployment()
         .addAsWebResource("de/openknowledge/jsf/component/telephone/phoneNumber.xhtml", "resources/ok/phoneNumber.xhtml")
-        .addAsWebResource("phoneNumberComponentTest.xhtml");
-  }
-
-  @Test
-  public void validPhoneNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    super.validPhoneNumber(page);
-  }
-
-  @Test
-  public void emptyAreaCode(@InitialPage PhoneNumberComponentTestPage page) {
-    super.emptyAreaCode(page);
-  }
-
-  @Test
-  public void inconvertibleAreaCode(@InitialPage PhoneNumberComponentTestPage page) {
-    super.inconvertibleAreaCode(page);
-  }
-
-  @Test
-  public void invalidAreaCode(final @InitialPage PhoneNumberComponentTestPage page) {
-    super.invalidAreaCode(page);
-  }
-
-  @Test
-  public void emptySubscriberNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    super.emptySubscriberNumber(page);
-  }
-
-  @Test
-  public void inconvertibleSubscriberNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    super.inconvertibleSubscriberNumber(page);
-  }
-
-  @Test
-  public void invalidSubscriberNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    super.invalidSubscriberNumber(page);
-  }
-
-  @Test
-  public void emptyPhoneNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    assertThat(page.getPhoneNumber().getAreaCode(), is("0441"));
-    assertThat(page.getPhoneNumber().getSubscriberNumber(), is("4082100"));
-    super.emptyPhoneNumber(page);
-  }
-
-  @Test
-  public void inconvertiblePhoneNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    super.inconvertiblePhoneNumber(page);
-  }
-
-  @Test
-  public void invalidPhoneNumber(@InitialPage PhoneNumberComponentTestPage page) {
-    super.invalidPhoneNumber(page);
+        .addAsWebResource("phoneNumberComponentTest.xhtml", "phoneNumber.xhtml");
   }
 
   @Override

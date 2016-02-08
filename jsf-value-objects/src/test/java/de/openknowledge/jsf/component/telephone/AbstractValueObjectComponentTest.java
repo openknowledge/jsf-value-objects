@@ -1,11 +1,11 @@
 /*
  * Copyright (C) Arne Limburg
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -16,6 +16,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.graphene.page.InitialPage;
+import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 
 public abstract class AbstractValueObjectComponentTest {
@@ -23,22 +25,24 @@ public abstract class AbstractValueObjectComponentTest {
   @Drone
   private WebDriver browser;
 
-  public void validPhoneNumber(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void validPhoneNumber(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("040");
     page.getPhoneNumber().setSubscriberNumber("123456");
     page.submit();
-    
+
     assertThat(page.getResult(), is("040 123456"));
-    
+
     assertThat(page.getPhoneNumber().getAreaCodeMessage(), is(""));
     assertThat(page.getPhoneNumber().getSubscriberNumberMessage(), is(""));
     assertThat(page.getPhoneNumberMessage(), is(""));
     assertThat(page.getSubmitMessage(), is("The data was successfully saved"));
   }
 
-  public void emptyAreaCode(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void emptyAreaCode(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("");
@@ -46,14 +50,15 @@ public abstract class AbstractValueObjectComponentTest {
     page.submit();
 
     assertThat(page.getResult(), is("null 123456"));
-    
+
     assertThat(page.getPhoneNumber().getAreaCodeMessage(), is(""));
     assertThat(page.getPhoneNumber().getSubscriberNumberMessage(), is(""));
     assertThat(page.getPhoneNumberMessage(), is(""));
     assertThat(page.getSubmitMessage(), is("The data was successfully saved"));
   }
 
-  public void inconvertibleAreaCode(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void inconvertibleAreaCode(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("123");
@@ -68,7 +73,8 @@ public abstract class AbstractValueObjectComponentTest {
     assertThat(page.getSubmitMessage(), is(""));
   }
 
-  public void invalidAreaCode(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void invalidAreaCode(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("01234");
@@ -81,11 +87,12 @@ public abstract class AbstractValueObjectComponentTest {
     assertThat(page.getPhoneNumber().getSubscriberNumberMessage(), is(""));
     assertThat(page.getPhoneNumberMessage(), is("could not create phone number"));
     assertThat(page.getSubmitMessage(), is(""));
-   }
+  }
 
-  public void emptySubscriberNumber(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void emptySubscriberNumber(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
- 
+
     page.getPhoneNumber().setAreaCode("040");
     page.getPhoneNumber().setSubscriberNumber("");
     page.submit();
@@ -98,7 +105,8 @@ public abstract class AbstractValueObjectComponentTest {
     assertThat(page.getSubmitMessage(), is("The data was successfully saved"));
   }
 
-  public void inconvertibleSubscriberNumber(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void inconvertibleSubscriberNumber(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("040");
@@ -106,14 +114,15 @@ public abstract class AbstractValueObjectComponentTest {
     page.submit();
 
     assertThat(page.getResult(), is(initialValue()));
-    
+
     assertThat(page.getPhoneNumber().getAreaCodeMessage(), is(""));
     assertThat(page.getPhoneNumber().getSubscriberNumberMessage(), is("subscriber number may not be '12345'"));
     assertThat(page.getPhoneNumberMessage(), is("could not create phone number"));
     assertThat(page.getSubmitMessage(), is(""));
   }
 
-  public void invalidSubscriberNumber(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void invalidSubscriberNumber(@InitialPage PhoneNumberTestPage page) {
 
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
@@ -122,14 +131,15 @@ public abstract class AbstractValueObjectComponentTest {
     page.submit();
 
     assertThat(page.getResult(), is(initialValue()));
-    
+
     assertThat(page.getPhoneNumber().getAreaCodeMessage(), is(""));
     assertThat(page.getPhoneNumber().getSubscriberNumberMessage(), is("subscriber number may not start with 0"));
     assertThat(page.getPhoneNumberMessage(), is("could not create phone number"));
     assertThat(page.getSubmitMessage(), is(""));
   }
 
-  public void emptyPhoneNumber(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void emptyPhoneNumber(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("");
@@ -144,7 +154,8 @@ public abstract class AbstractValueObjectComponentTest {
     assertThat(page.getSubmitMessage(), is("The data was successfully saved"));
   }
 
-  public void inconvertiblePhoneNumber(AbstractPhoneNumberTestPage page) {
+  @Test
+  public void inconvertiblePhoneNumber(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("012345");
@@ -159,20 +170,21 @@ public abstract class AbstractValueObjectComponentTest {
     assertThat(page.getSubmitMessage(), is(""));
   }
 
-  public void invalidPhoneNumber(AbstractPhoneNumberTestPage page) {
-    assertThat(browser.getTitle(), is("JSF Value Object Sample"));    
+  @Test
+  public void invalidPhoneNumber(@InitialPage PhoneNumberTestPage page) {
+    assertThat(browser.getTitle(), is("JSF Value Object Sample"));
 
     page.getPhoneNumber().setAreaCode("0123");
     page.getPhoneNumber().setSubscriberNumber("456789");
     page.submit();
 
     assertThat(page.getResult(), is(initialValue()));
-    
+
     assertThat(page.getPhoneNumber().getAreaCodeMessage(), is(""));
     assertThat(page.getPhoneNumber().getSubscriberNumberMessage(), is(""));
     assertThat(page.getPhoneNumberMessage(), is("phone number may not be '0123 456789'"));
     assertThat(page.getSubmitMessage(), is(""));
   }
-  
+
   protected abstract String initialValue();
 }

@@ -11,10 +11,47 @@
  * specific language governing permissions and limitations under the License.
  */
 package de.openknowledge.jsf.component.telephone;
+import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 
 import org.jboss.arquillian.graphene.page.Location;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
-@Location("phoneNumberTest.xhtml")
-public class PhoneNumberTestPage extends AbstractPhoneNumberTestPage {
+@Location("phoneNumber.xhtml")
+public class PhoneNumberTestPage {
 
+  @FindBy(id = "phoneNumber")
+  private PhoneNumberComponentFragment phoneNumber;
+
+  @FindBy(id = "phoneNumberMessage")
+  private WebElement phoneNumberMessage;
+  
+  @FindBy(id = "submit")
+  private WebElement submit;
+
+  @FindBy(id = "submitMessage")
+  private WebElement submitMessage;
+  
+  @FindBy(id = "result")
+  private WebElement result;
+
+  public PhoneNumberComponentFragment getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  public String getPhoneNumberMessage() {
+    return phoneNumberMessage.getText();
+  }
+
+  public String getSubmitMessage() {
+    return submitMessage.getText();
+  }
+
+  public String getResult() {
+    return result.getText();
+  }
+
+  public void submit() {
+    guardHttp(submit).click();
+  }
 }

@@ -17,6 +17,7 @@ import de.openknowledge.domain.telephone.PhoneNumber;
 import de.openknowledge.domain.telephone.SubscriberNumber;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -33,8 +34,8 @@ public class PhoneNumberController implements Serializable {
   private PhoneNumber phoneNumber;
   
   @PostConstruct
-  private void initializePhoneNumber() {
-    if (!FacesContext.getCurrentInstance().getExternalContext().getRequestServletPath().contains("empty")) {
+  private void initializePhoneNumber() throws MalformedURLException {
+    if (FacesContext.getCurrentInstance().getExternalContext().getResource("/empty.txt") == null) {
       phoneNumber = INITIAL_VALUE;
     }
   }
