@@ -17,9 +17,6 @@ public class ValueObjectComponentEmptyValueTest extends AbstractValueObjectCompo
   
   @Deployment
   public static WebArchive deployment() {
-    System.out.println(Deployments.phoneNumberDeployment()
-        .addAsWebResource(EmptyAsset.INSTANCE, "empty.txt")
-        .addAsWebResource("emptyPhoneNumberTest.xhtml", "phoneNumber.xhtml").toString(true));
     return Deployments.phoneNumberDeployment()
         .addAsWebResource(EmptyAsset.INSTANCE, "empty.txt")
         .addAsWebResource("emptyPhoneNumberTest.xhtml", "phoneNumber.xhtml");
