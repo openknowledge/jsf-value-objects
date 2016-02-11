@@ -103,24 +103,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   @Override
-  public void encodeBegin(FacesContext context) throws IOException {
-    super.encodeBegin(context);
-    if (!isValid()) {
-      return;
-    }
-    Object value = getValue();
-    if (value == null) {
-      forEachChild(new ChildProcessor() {
-
-        public void process(UIInput child) {
-          child.setValue(null);
-          child.setLocalValueSet(false);
-        }
-      });
-    }
-  }
-
-  @Override
   public void processDecodes(FacesContext context) {
     super.processDecodes(context);
     final StringBuilder submittedValue = new StringBuilder();
@@ -137,18 +119,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     if (submittedValue.length() > 0) {
       setSubmittedValue(submittedValue.toString());
     }
-  }
-
-  @Override
-  public void processUpdates(FacesContext context) {
-    forEachChild(new ChildProcessor() {
-
-      public void process(UIInput child) {
-        child.setValue(null);
-        child.setLocalValueSet(false);
-      }
-    });
-    super.processUpdates(context);
   }
 
   @Override
@@ -172,6 +142,36 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
         child.setSubmittedValue(oldSubmittedValues.get(child));
       }
     });
+  }
+
+  @Override
+  public void processUpdates(FacesContext context) {
+    forEachChild(new ChildProcessor() {
+
+      public void process(UIInput child) {
+        child.setValue(null);
+        child.setLocalValueSet(false);
+      }
+    });
+    super.processUpdates(context);
+  }
+
+  @Override
+  public void encodeBegin(FacesContext context) throws IOException {
+    super.encodeBegin(context);
+    if (!isValid()) {
+      return;
+    }
+    Object value = getValue();
+    if (value == null) {
+      forEachChild(new ChildProcessor() {
+
+        public void process(UIInput child) {
+          child.setValue(null);
+          child.setLocalValueSet(false);
+        }
+      });
+    }
   }
 
   protected void processChildValidators(final FacesContext context) {
