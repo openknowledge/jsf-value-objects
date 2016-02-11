@@ -49,24 +49,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   @Override
-  public void encodeBegin(FacesContext context) throws IOException {
-    super.encodeBegin(context);
-    if (!isValid()) {
-      return;
-    }
-    Object value = getValue();
-    if (value == null) {
-      forEachChild(new ChildProcessor() {
-
-        public void process(UIInput child) {
-          child.setValue(null);
-          child.setLocalValueSet(false);
-        }
-      });
-    }
-  }
-
-  @Override
   public Object getValue() {
     return inCompositeComponentContext(new Callable<Object>() {
       public Object call() {
@@ -110,6 +92,35 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   @Override
+  public void resetValue() {
+    super.resetValue();
+    forEachChild(new ChildProcessor() {
+
+      public void process(UIInput child) {
+        child.resetValue();
+      }
+    });
+  }
+
+  @Override
+  public void encodeBegin(FacesContext context) throws IOException {
+    super.encodeBegin(context);
+    if (!isValid()) {
+      return;
+    }
+    Object value = getValue();
+    if (value == null) {
+      forEachChild(new ChildProcessor() {
+
+        public void process(UIInput child) {
+          child.setValue(null);
+          child.setLocalValueSet(false);
+        }
+      });
+    }
+  }
+
+  @Override
   public void processDecodes(FacesContext context) {
     super.processDecodes(context);
     final StringBuilder submittedValue = new StringBuilder();
@@ -138,17 +149,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
       }
     });
     super.processUpdates(context);
-  }
-
-  @Override
-  public void resetValue() {
-    super.resetValue();
-    forEachChild(new ChildProcessor() {
-
-      public void process(UIInput child) {
-        child.resetValue();
-      }
-    });
   }
 
   @Override
