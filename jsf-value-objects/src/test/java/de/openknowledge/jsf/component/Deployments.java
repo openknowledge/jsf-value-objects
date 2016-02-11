@@ -8,7 +8,7 @@ import de.openknowledge.jsf.component.telephone.PhoneNumberController;
 import de.openknowledge.jsf.converter.AbstractSimpleValueObjectConverter;
 import de.openknowledge.jsf.converter.address.CityNameConverter;
 import de.openknowledge.jsf.converter.telephone.AreaCodeConverter;
-import de.openknowledge.jsf.validator.PhoneNumberValidator;
+import de.openknowledge.jsf.validator.telephone.PhoneNumberValidator;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -18,6 +18,7 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.webapp30.WebAppDescriptor;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
+
 
 /*
  * Copyright (C) Arne Limburg

@@ -28,6 +28,11 @@ public abstract class AbstractValueObjectComponentTest {
   @Test
   public void validPhoneNumber(@InitialPage PhoneNumberTestPage page) {
     assertThat(browser.getTitle(), is("JSF Value Object Sample"));
+    String initialPhoneNumber = initialValue();
+    if (initialPhoneNumber.equals("null")) {
+      initialPhoneNumber = " ";
+    }
+    assertThat(page.getPhoneNumber().getAreaCode() + " " + page.getPhoneNumber().getSubscriberNumber(), is(initialPhoneNumber));
 
     page.getPhoneNumber().setAreaCode("040");
     page.getPhoneNumber().setSubscriberNumber("123456");

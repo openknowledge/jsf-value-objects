@@ -99,6 +99,17 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   @Override
+  public void setLocalValueSet(final boolean localValueSet) {
+    super.setLocalValueSet(localValueSet);
+    forEachChild(new ChildProcessor() {
+
+      public void process(UIInput child) {
+        child.setLocalValueSet(localValueSet);;
+      }
+    });
+  }
+
+  @Override
   public void processDecodes(FacesContext context) {
     super.processDecodes(context);
     final StringBuilder submittedValue = new StringBuilder();
