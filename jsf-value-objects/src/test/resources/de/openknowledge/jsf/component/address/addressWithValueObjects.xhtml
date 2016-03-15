@@ -26,16 +26,16 @@
   <div id="#{cc.clientId}">
     <ok:valueObject
       id="street"
-      value="#{addressController.address.street}">
+      value="#{cc.attrs.value.street}">
       <h:inputText
         id="streetName"
-        value="#{addressController.address.street.name}" />
+        value="#{cc.attrs.value.street.name}" />
       <h:message
         id="streetNameMessage"
         for="streetName" />
       <h:inputText
         id="streetNumber"
-        value="#{addressController.address.street.number}" />
+        value="#{cc.attrs.value.street.number}" />
       <h:message
         id="streetNumberMessage"
         for="streetNumber" />
@@ -45,16 +45,16 @@
       for="street" />
     <ok:valueObject
       id="city"
-      value="#{addressController.address.city}">
+      value="#{cc.attrs.value.city}">
       <h:inputText
         id="zipCode"
-        value="#{addressController.address.city.zipCode}" />
+        value="#{cc.attrs.value.city.zipCode}" />
       <h:message
         id="zipCodeMessage"
         for="zipCode" />
       <h:inputText
         id="cityName"
-        value="#{addressController.address.city.name}" />
+        value="#{cc.attrs.value.city.name}" />
       <h:message
         id="cityNameMessage"
         for="cityName" />

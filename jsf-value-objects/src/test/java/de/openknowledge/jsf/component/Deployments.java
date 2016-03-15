@@ -40,7 +40,7 @@ public class Deployments {
     PomEquippedResolveStage pom = Maven.resolver().loadPomFromFile("pom.xml");
     return ShrinkWrap.create(WebArchive.class)
         .addAsLibraries(pom.resolve("org.apache.commons:commons-lang3").withTransitivity().asFile())
-        .addClass(ValueObjectComponent.class)
+        .addPackage(ValueObjectComponent.class.getPackage())
         .addAsWebResource("META-INF/resources/ok/valueObject.xhtml", "resources/ok/valueObject.xhtml")
         .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
         .setWebXML(new StringAsset(Descriptors.create(WebAppDescriptor.class)

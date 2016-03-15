@@ -39,9 +39,9 @@ import javax.faces.convert.ConverterException;
 @FacesComponent("de.openknowledge.jsf.component.ValueObjectComponent")
 public class ValueObjectComponent extends UIInput implements NamingContainer {
 
-  private static final String SUBMITTED_VALUE_DELIMITER = "submittedValueDelimiter";
+  protected static final String SUBMITTED_VALUE_DELIMITER = "submittedValueDelimiter";
 
-  private static final String CC_ATTRS_VALUE = "#{cc.attrs.value.";
+  protected static final String CC_ATTRS_VALUE = "#{cc.attrs.value.";
 
   @Override
   public String getFamily() {
@@ -60,16 +60,15 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   @Override
   public void setValue(Object value) {
     super.setValue(value);
+
     if (value == null) {
       forEachChild(new ChildProcessor() {
-
         public void process(UIInput child) {
           child.setValue(null);
         }
       });
     } else {
       forEachChild(new ChildProcessor() {
-
         public void process(UIInput child) {
           if (child.isLocalValueSet()) {
             child.setValue(null);
@@ -84,7 +83,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   public void setLocalValueSet(final boolean localValueSet) {
     super.setLocalValueSet(localValueSet);
     forEachChild(new ChildProcessor() {
-
       public void process(UIInput child) {
         child.setLocalValueSet(localValueSet);;
       }
@@ -95,7 +93,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   public void resetValue() {
     super.resetValue();
     forEachChild(new ChildProcessor() {
-
       public void process(UIInput child) {
         child.resetValue();
       }
@@ -108,14 +105,15 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     final StringBuilder submittedValue = new StringBuilder();
     final Object submittedValueDelimiter
       = getAttributes().containsKey(SUBMITTED_VALUE_DELIMITER) ? getAttributes().get(SUBMITTED_VALUE_DELIMITER) : ",";
-    forEachChild(new ChildProcessor() {
 
+    forEachChild(new ChildProcessor() {
       public void process(UIInput child) {
         if (child.getSubmittedValue() != null) {
           submittedValue.append(child.getSubmittedValue()).append(submittedValueDelimiter);
         }
       }
     });
+    
     if (submittedValue.length() > 0) {
       setSubmittedValue(submittedValue.toString());
     }
@@ -126,18 +124,20 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     if (getSubmittedValue() == null) {
       return;
     }
+
     processChildValidators(context);
+    
     final Map<UIInput, Object> oldSubmittedValues = new HashMap<>();
     forEachChild(new ChildProcessor() {
-
       public void process(UIInput child) {
         oldSubmittedValues.put(child, child.getSubmittedValue());
         child.setSubmittedValue(null);
       }
     });
-    super.processValidators(context);
-    forEachChild(new ChildProcessor() {
 
+    super.processValidators(context);
+    
+    forEachChild(new ChildProcessor() {
       public void process(UIInput child) {
         child.setSubmittedValue(oldSubmittedValues.get(child));
       }
@@ -147,7 +147,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   @Override
   public void processUpdates(FacesContext context) {
     forEachChild(new ChildProcessor() {
-
       public void process(UIInput child) {
         child.setValue(null);
         child.setLocalValueSet(false);
@@ -159,13 +158,14 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   @Override
   public void encodeBegin(FacesContext context) throws IOException {
     super.encodeBegin(context);
+    
     if (!isValid()) {
       return;
     }
+
     Object value = getValue();
     if (value == null) {
       forEachChild(new ChildProcessor() {
-
         public void process(UIInput child) {
           child.setValue(null);
           child.setLocalValueSet(false);
@@ -182,14 +182,12 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
       super.setValue(newInstance(context));
       wasNull = true;
     }
+
     try {
       pushComponentToEL(context, this);
-      forEachChild(new ChildProcessor() {
-
-        public void process(UIInput child) {
-          child.processValidators(context);
-        }
-      });
+      for (Iterator<UIComponent> i = getFacetsAndChildren(); i.hasNext();) {
+        i.next().processValidators(context);
+      }
     } finally {
       popComponentFromEL(context);
       if (wasNull) {
@@ -212,7 +210,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   protected Object getConvertedValue(final FacesContext context, Object submittedValue) throws ConverterException {
     final List<UIInput> parameters = new ArrayList<>();
     forEachChild(new ChildProcessor() {
-
       public void process(UIInput child) {
         if (!child.isValid()) {
           throw new ConverterException(child.getClientId() + " is invalid");
@@ -223,10 +220,11 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     return newInstance(context, parameters.toArray(new UIInput[parameters.size()]));
   }
 
-  protected Object newInstance(final FacesContext context, UIInput... parameterComponents) {
+  protected Object newInstance(FacesContext context, UIInput... parameterComponents) {
     List<Object> parameterValues = new ArrayList<>();
     List<Class<?>> parameterTypes = new ArrayList<>();
     boolean allParametersNull = true;
+
     for (UIInput parameterComponent: parameterComponents) {
       Object parameterValue = parameterComponent.getValue();
       parameterValues.add(parameterValue);
@@ -240,11 +238,17 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
     if (parameterComponents.length != 0 && allParametersNull && valueIsNullWhenAllParametersAreNull()) {
       return null;
     }
+    
+    return newInstance(context, parameterTypes, parameterValues);
+  }
+
+  private Object newInstance(final FacesContext context, List<Class<?>> parameterTypes, List<Object> parameterValues) {
     Class<?> type = inCompositeComponentContext(new Callable<Class<?>>() {
       public Class<?> call() throws Exception {
         return getValueExpression("value").getType(context.getELContext());
       }
     });
+
     try {
       Constructor<?> constructor = getConstructor(type, parameterTypes.toArray(new Class<?>[parameterTypes.size()]));
       if (!constructor.isAccessible()) {
@@ -259,67 +263,21 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   protected void forEachChild(ChildProcessor processor) {
-    ValueExpression oldValueExpression = getValueExpression("value");
-    String parentValueExpression = oldValueExpression.getExpressionString();
-    String resolvedParentValueExpression = getResolvedExpressionString();
-    String prefix = resolvedParentValueExpression.substring(0, resolvedParentValueExpression.lastIndexOf('}')) + '.';
-    
-    boolean replaceValueExpression = false;
-    if (parentValueExpression.startsWith(CC_ATTRS_VALUE)) {
-      ValueExpression valueExpression = createValueExpression(resolvedParentValueExpression, oldValueExpression.getExpectedType());
-      setValueExpression("value", valueExpression);
-      replaceValueExpression = true;
-    }
     for (UIComponent component : getFacet(COMPOSITE_FACET_NAME).getChildren()) {
-      forEachChild(component, processor, prefix);
-    }
-    if (replaceValueExpression) {
-      setValueExpression("value", oldValueExpression);
+      forEachChild(component, processor);
     }
   }
 
-  private void forEachChild(UIComponent parent, ChildProcessor processor, String prefix) {
+  private void forEachChild(UIComponent parent, ChildProcessor processor) {
     if (parent instanceof UIInput) {
       UIInput input = (UIInput)parent;
-      ValueExpression childValueExpression = input.getValueExpression("value");
-      String childValueExpressionString = input.getValueExpression("value").getExpressionString();
-      if (childValueExpressionString.startsWith(prefix)) {
-        // lookup has to be directed to local value, so replace value expression with #{cc.attrs.value...}
-        // TODO maybe cache new value expression?
-        ValueExpression valueExpression
-          = createValueExpression(childValueExpressionString.replace(prefix, CC_ATTRS_VALUE), childValueExpression.getExpectedType());
-        input.setValueExpression("value", valueExpression);
-        try {
-          processor.process(input);
-        } finally {
-          // finally reset original value expression
-          input.setValueExpression("value", childValueExpression);
-        }
-      } else if (childValueExpressionString.startsWith(CC_ATTRS_VALUE)) {
-        processor.process(input);
-      }
+      processor.process(input);
     }
     if (!(parent instanceof ValueObjectComponent)) {
       for (Iterator<UIComponent> i = parent.getFacetsAndChildren(); i.hasNext();) {
-        forEachChild(i.next(), processor, prefix); 
+        forEachChild(i.next(), processor); 
       }
     }
-  }
-
-  private String getResolvedExpressionString() {
-    ValueExpression valueExpression = getValueExpression("value");
-    String expressionString = valueExpression.getExpressionString();
-    
-    if (!expressionString.startsWith(CC_ATTRS_VALUE)) {
-      return expressionString;
-    }
-    UIComponent parent = getParent();
-    while (!(parent instanceof ValueObjectComponent) && parent != null) {
-      parent = parent.getParent();
-    }
-    String parentExpressionString = parent.getValueExpression("value").getExpressionString();
-    return parentExpressionString.substring(0, parentExpressionString.lastIndexOf('}'))
-        + expressionString.substring(CC_ATTRS_VALUE.length() - 1);
   }
 
   protected ValueExpression createValueExpression(String expressionString, Class<?> expectedType) {
@@ -413,7 +371,6 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   }
 
   public interface ChildProcessor {
-
     void process(UIInput child);
   }
 }
