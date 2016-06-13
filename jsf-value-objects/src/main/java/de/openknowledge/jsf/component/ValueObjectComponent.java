@@ -211,16 +211,22 @@ public class ValueObjectComponent extends UIInput implements NamingContainer {
   @Override
   protected Object getConvertedValue(final FacesContext context, Object submittedValue) throws ConverterException {
     final List<UIInput> parameters = new ArrayList<>();
+    final boolean[] isValid = {true};
     forEachChild(new ChildProcessor() {
 
       public void process(UIInput child) {
-        if (!child.isValid()) {
-          throw new ConverterException(child.getClientId() + " is invalid");
+        isValid[0] &= child.isValid();
+        if (isValid[0]) {
+          parameters.add(child);
         }
-        parameters.add(child);
       }
     });
-    return newInstance(context, parameters.toArray(new UIInput[parameters.size()]));
+    if (isValid[0]) {
+      return newInstance(context, parameters.toArray(new UIInput[parameters.size()]));
+    } else {
+      setValid(false);
+      return null;
+    }
   }
 
   protected Object newInstance(final FacesContext context, UIInput... parameterComponents) {
