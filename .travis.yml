@@ -1,0 +1,29 @@
+language: java
+jdk:
+  - openjdk7
+  #- oraclejdk8 moved to jobs section, see below
+  - openjdk8
+  #- oraclejdk9 jacoco does not work
+  #- openjdk9 not available for Trusty
+env:
+  - CONTAINER=wildfly
+  #- CONTAINER=tomee disabled until test failures are fixed
+before_install: cd jsf-value-objects
+install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P $CONTAINER
+script: mvn test -B -P $CONTAINER
+cache:
+    directories:
+        - $HOME/.m2
+addons:
+  sonarcloud:
+    organization: "ok"
+jobs:
+  include:
+    - jdk: oraclejdk8
+      env:
+        - CONTAINER=wildfly
+      script: mvn test -B -P $CONTAINER sonar:sonar
+    #- jdk: oraclejdk8
+    #  env:
+    #    - CONTAINER=tomee
+    #  script: mvn test -B -P $CONTAINER
