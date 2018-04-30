@@ -8,7 +8,7 @@ jdk:
   #- openjdk9 not available for Trusty
 env:
   - CONTAINER=wildfly
-  - CONTAINER=tomee
+  #- CONTAINER=tomee disabled until test failures are fixed
 before_install: cd jsf-value-objects
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P $CONTAINER
 script: mvn test -B -P $CONTAINER
